@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- AOS Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bizz Mentor - Course Packages</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+	/* === Smooth Scroll, Hover, Glow === */
+html {
+  scroll-behavior: smooth;
+}
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.glow-link {
+  transition: text-shadow 0.3s ease;
+}
+.glow-link:hover {
+  text-shadow: 0 0 10px #00f6ff, 0 0 20px #00f6ff;
+}
+
+	 /* Fade-in on scroll */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Button hover animation */
+  .btn-animate {
+    transition: all 0.3s ease;
+  }
+  .btn-animate:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Pricing card hover lift */
+  .card-animate {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card-animate:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  }
+        /* Custom styles for the 3D button and the Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7; /* Light background for the subtle network effect */
+            overflow-x: hidden; /* Prevent horizontal scroll from any animation overflow */
+            scroll-behavior: smooth; /* ADDED: Smooth scrolling for navigation links */
+        }
+
+        /* Define the primary brand colors */
+        .bg-primary-brand { background-color: #10b981; } /* Emerald */
+        .text-primary-brand { color: #10b981; }
+        .bg-primary-dark { background-color: #1f2937; } /* Gray-800 */
+        .text-primary-dark { color: #1f2937; }
+
+        /* --- Full-Screen Background Canvas for Animation --- */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; /* Pushes it behind all content */
+            opacity: 0.8; /* Keep it subtle */
+        }
+
+        /* --- Ensuring Content is Above the Canvas --- */
+        main {
+            position: relative;
+            z-index: 10; /* Ensure main content is clearly visible */
+        }
+        .ticker-tape { z-index: 50; } 
+        header { z-index: 55; }
+        .modal-overlay { z-index: 1000; }
+        
+        /* Custom 3D Button/Card Effect */
+        .package-card-btn {
+            position: relative;
+            transform: translateY(0);
+            transition: transform 0.1s ease-out;
+        }
+        /* Shadow for the "depth" effect */
+        .package-card-btn:not(.active):hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), inset 0 0 0 3px #10b981;
+        }
+        /* Active state for a "pressed" look */
+        .package-card-btn.active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.1), inset 0 0 0 3px #10b981;
+        }
+
+        /* Style for the course list items */
+        .course-list-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .course-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Simple animation for dropdown */
+        .accordion-content {
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .accordion-content.open {
+            max-height: 1000px; /* Large enough value to reveal content */
+            padding-top: 1.5rem; /* pt-6 */
+            padding-bottom: 1.5rem; /* pb-6 */
+        }
+        
+        /* --- ARROW ANIMATION (Micro-Bounce for Curiosity) --- */
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-4px) rotate(0deg); }
+        }
+        .arrow-animate {
+            animation: bounce-subtle 1.8s infinite;
+        }
+
+        /* --- LOGO ANIMATION (Stronger Pulse) --- */
+        @keyframes logo-pulse {
+            0%, 100% { color: #10b981; transform: scale(1); }
+            50% { color: #34d399; transform: scale(1.1); }
+        }
+        .logo-animate-pulse {
+            animation: logo-pulse 2.5s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        /* --- NEWS TICKER (Live Scrolling Bar) --- */
+        @keyframes scroll-left {
+            0% { transform: translateX(100vw); } 
+            100% { transform: translateX(-100%); }
+        }
+
+        .ticker-tape {
+            white-space: nowrap;
+            overflow: hidden;
+            background-color: #f97316; /* Deep Orange */
+            padding: 0.5rem 0;
+            position: relative; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .ticker-content {
+            display: inline-block;
+            animation: scroll-left 30s linear infinite; 
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); 
+        }
+        
+        /* --- BEST VALUE RIBBON for PLATINUM --- */
+        .best-value-ribbon {
+            position: absolute;
+            top: 25px; 
+            right: -25px; 
+            padding: 4px 20px;
+            background-color: #10b981; 
+            color: white;
+            font-weight: bold;
+            font-size: 0.875rem;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            z-index: 20; 
+            letter-spacing: 0.05em; 
+        }
+
+        /* Styling for the custom message modal (replacing alert()) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto; 
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            margin: 20px auto; 
+        }
+
+        /* --- LIVE NOTIFICATION POP-UP STYLES --- */
+        #live-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1f2937; /* Primary Dark */
+            color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            max-width: 300px;
+            z-index: 500; /* High z-index */
+            transform: translateX(120%); /* Start off-screen */
+            opacity: 0;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+        }
+        /* Mobile adjustment for better view */
+        @media (max-width: 640px) {
+            #live-notification {
+                left: 50%;
+                right: auto;
+                transform: translateX(calc(-50% + 120%)); /* Keep animation working but centered */
+                bottom: 10px;
+                max-width: 90%;
+            }
+            #live-notification.show {
+                transform: translateX(-50%);
+            }
+        }
+        
+        #live-notification.show {
+            transform: translateX(0); /* Slide into view */
+            opacity: 1;
+        }
+
+        /* --- QUIZ MODAL STYLES --- */
+        #quizModal .quiz-step {
+            display: none;
+        }
+        #quizModal .quiz-step.active {
+            display: block;
+        }
+        .quiz-option-btn {
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .quiz-option-btn:hover {
+            background-color: #ecfdf5; /* green-50 */
+        }
+        .quiz-option-btn.selected {
+            background-color: #d1fae5; /* green-100 */
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px #10b981;
+        }
+        
+        /* --- PACKAGE HIGHLIGHT ANIMATION --- */
+        @keyframes highlight-flash {
+            0%, 100% { box-shadow: 0 0 0px 0px rgba(16, 185, 129, 0); }
+            50% { box-shadow: 0 0 10px 5px rgba(16, 185, 129, 0.7); }
+        }
+        .highlight-flash {
+            animation: highlight-flash 1.5s ease-in-out;
+        }
+        
+        /* AFFILIATE DISCLOSURE BAR - CUSTOM CSS REMOVED. It now sits statically in the footer. */
+	
+	/* WhatsApp Floating Button */
+.whatsapp-float {
+  position: fixed;
+  width: 65px;
+  height: 65px;
+  bottom: 25px;
+  right: 25px; /* change to left:25px; if you want it on left */
+  background-color: #25d366;
+  color: #fff;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 32px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 999;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+
+.whatsapp-icon {
+  width: 100%;
+  height: 60%;
+  margin-top: 13px;
+}
+@keyframes whatsapp-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.whatsapp-float {
+  animation: whatsapp-bounce 3s infinite ease-in-out;
+}
+/* 🔥 Pulse Animation for Platinum Package */
+.platinum {
+  animation: platinumPulse 3s infinite ease-in-out;
+}
+
+@keyframes platinumPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(0, 255, 128, 0.4);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 70px rgba(0, 255, 128, 0.8);
+  }
+}
+
+
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-brand': '#10b981',
+                        'primary-dark': '#1f2937',
+                    },
+                }
+            }
+        }
+
+        // --- PARTICLE NETWORK ANIMATION LOGIC ---
+        let canvas, ctx, particles, width, height;
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 0.8;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+                this.color = '#d1d5db';
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > height) this.vy = -this.vy;
+
+                this.draw();
+            }
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('bgCanvas');
+            ctx = canvas.getContext('2d');
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            particles = [];
+            const particleCount = width < 768 ? 60 : 100;
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(Math.random() * width, Math.random() * height));
+            }
+
+            animateNetwork();
+            startNotificationCycle(); 
+        }
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        function drawLines() {
+            const maxDistance = 120;
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i; j < particles.length; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+                    
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < maxDistance) {
+                        const opacity = 1 - (distance / maxDistance);
+                        ctx.strokeStyle = `rgba(16, 185, 129, ${opacity})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateNetwork() {
+            requestAnimationFrame(animateNetwork);
+            ctx.clearRect(0, 0, width, height);
+
+            drawLines();
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+            }
+        }
+
+        window.onload = function () {
+            initCanvas();
+            // Initialize calculator display
+            calculateEarnings(); 
+            // Initialize dynamic testimonial dates (NEW)
+            generateDynamicDates();
+        }
+
+        // --- ACCORDION & GENERIC MODAL LOGIC ---
+
+        function toggleCourses(id) {
+            const content = document.getElementById(`content-${id}`);
+            const button = document.getElementById(`btn-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+
+            const isOpen = content.classList.contains('open');
+
+            document.querySelectorAll('.accordion-content').forEach(c => {
+                const otherId = c.id.split('-')[1];
+                c.classList.remove('open');
+                
+                const otherButton = document.getElementById(`btn-${otherId}`);
+                otherButton.classList.remove('active');
+
+                document.getElementById(`icon-${otherId}`).classList.remove('rotate-180');
+                document.getElementById(`icon-${otherId}`).classList.add('arrow-animate');
+            });
+            
+            if (!isOpen) {
+                content.classList.add('open');
+                button.classList.add('active');
+                icon.classList.add('rotate-180');
+                icon.classList.remove('arrow-animate');
+            }
+        }
+
+        function handleSubmitQuery(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('queryForm');
+            const name = form.querySelector('#name').value;
+            const email = form.querySelector('#email').value;
+            const query = form.querySelector('#query').value;
+
+            if (!name || !email || !query) {
+                showModal('Error', 'Please fill in all fields before sending your query.');
+                return;
+            }
+
+            showModal('Query Sent!', 'Thanks, ' + name + '! We have received your query and will get back to you shortly via ' + email + '.');
+
+            form.reset();
+        }
+
+        function showModal(title, message, modalId = 'messageModal') {
+            const modalOverlay = document.getElementById(modalId);
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            modalOverlay.style.display = 'flex';
+        }
+
+        function hideModal(modalId = 'messageModal') {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+
+        // --- SOCIAL PROOF (LIVE NOTIFICATION) LOGIC ---
+        
+        const SALES_DATA = [
+            { name: 'Aisha H.', location: 'Lahore', package: 'PLATINUM', color: 'text-indigo-400' },
+            { name: 'Rohit K.', location: 'Mumbai', package: 'PREMIUM', color: 'text-amber-400' },
+            { name: 'Usman M.', location: 'Dubai', package: 'PRIME', color: 'text-cyan-400' },
+            { name: 'Sara B.', location: 'Islamabad', package: 'PLATINUM', color: 'text-indigo-400' },
+            { name: 'Kiran T.', location: 'New Delhi', package: 'PRO', color: 'text-primary-brand' },
+            { name: 'Zeeshan A.', location: 'Karachi', package: 'PLATINUM', color: 'text-indigo-400' },
+            { name: 'Priya R.', location: 'Bangalore', package: 'PREMIUM', color: 'text-amber-400' },
+            { name: 'Farhan D.', location: 'Riyadh', package: 'PRIME', color: 'text-cyan-400' },
+        ];
+
+        function showLiveNotification() {
+            const notification = document.getElementById('live-notification');
+            const data = SALES_DATA[Math.floor(Math.random() * SALES_DATA.length)];
+            
+            document.getElementById('notif-name').textContent = data.name;
+            document.getElementById('notif-location').textContent = data.location;
+            document.getElementById('notif-package').textContent = data.package;
+            
+            const packageElement = document.getElementById('notif-package');
+            packageElement.className = `font-bold ${data.color}`;
+
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        function startNotificationCycle() {
+            setTimeout(() => {
+                showLiveNotification();
+                
+                setInterval(() => {
+                    const randomDelay = Math.random() * 10000 + 15000;
+                    setTimeout(showLiveNotification, randomDelay);
+                }, 25000); 
+            }, 1000 + Math.random() * 4000); 
+        }
+
+        // --- QUIZ & PACKAGE DATA LOGIC ---
+        
+        let currentStep = 1;
+        let quizAnswers = {};
+
+        const PACKAGES = {
+            PLUS: { name: 'PLUS Package', price: 9, link: '#checkout-plus', focus: 'Foundational Skills', key: 'plus' },
+            PRO: { name: 'PRO Package', price: 23, link: '#checkout-pro', focus: 'Intermediate Marketing', key: 'pro' },
+            PRIME: { name: 'PRIME Package', price: 53, link: '#checkout-prime', focus: 'E-commerce & Freelancing', key: 'prime' },
+            PREMIUM: { name: 'PREMIUM Package', price: 122, link: '#checkout-premium', focus: 'Advanced Ads & FBA', key: 'premium' },
+            PLATINUM: { name: 'PLATINUM Package', price: 200, link: '#checkout-platinum', focus: 'Full Master Resale Rights + AI Marketing', key: 'platinum' }
+        };
+
+        function startQuiz() {
+            currentStep = 1;
+            document.getElementById('quizModal').style.display = 'flex';
+            showStep(1);
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            // Highlight selected answer if returning to a step
+            document.querySelectorAll(`#step-${step} .quiz-option-btn`).forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.value === quizAnswers[`q${step}`]) {
+                    btn.classList.add('selected');
+                }
+            });
+
+            // Update progress
+            document.getElementById('quiz-progress').style.width = `${(step / 3) * 100}%`;
+            document.getElementById('quiz-progress-text').textContent = `Question ${step} of 3`;
+        }
+
+        function selectAnswer(question, answer, nextStep) {
+            const stepId = `step-${question}`;
+            const questionKey = `q${question}`;
+            quizAnswers[questionKey] = answer;
+            
+            // Visually select the button
+            document.querySelectorAll(`#${stepId} .quiz-option-btn`).forEach(btn => btn.classList.remove('selected'));
+            document.querySelector(`#${stepId} .quiz-option-btn[data-value="${answer}"]`).classList.add('selected');
+
+            // Move to the next step after a short delay
+            setTimeout(() => {
+                currentStep = nextStep;
+                if (nextStep === 'result') {
+                    showResult();
+                } else {
+                    showStep(nextStep);
+                }
+            }, 200);
+        }
+        
+        // Function to handle smooth scroll, auto-open, and highlight after quiz
+        function scrollToPackage(packageKey) {
+            hideModal('quizModal');
+            
+            // Ensure the package accordion is open and highlight the card after a short delay
+            setTimeout(() => {
+                // Find the specific button/card container 
+                const targetElement = document.getElementById(`btn-${packageKey}`).closest('.overflow-hidden');
+                
+                if (targetElement) {
+                    // Scroll smoothly to the target card
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    // Open the accordion for the recommended package
+                    toggleCourses(packageKey); 
+                    
+                    // Add a visual flash/highlight to draw attention
+                    targetElement.classList.add('highlight-flash');
+                    setTimeout(() => {
+                        targetElement.classList.remove('highlight-flash');
+                    }, 1500); // Highlight for 1.5 seconds
+                }
+            }, 300); // Wait 300ms for modal to disappear
+        }
+
+        function showResult() {
+            // Decision Logic:
+            let resultKey = 'PLUS';
+            const q1 = quizAnswers.q1;
+            const q2 = quizAnswers.q2;
+            const q3 = quizAnswers.q3;
+
+            if (q1 === 'max_earn') {
+                if (q2 === 'all') {
+                    resultKey = 'PLATINUM'; // Max Earn + Resell All
+                } else {
+                    resultKey = 'PREMIUM'; // Max Earn + Resell Up to Premium
+                }
+            } else if (q1 === 'learn_only') {
+                if (q3 === 'budget') {
+                    resultKey = 'PLUS'; // Learn Only + Lowest Budget
+                } else if (q3 === 'advanced') {
+                    resultKey = 'PREMIUM'; // Learn Only + Advanced Skills
+                } else if (q3 === 'upgrade_later') {
+                    resultKey = 'PLATINUM'; // Want the full learning library
+                }
+            } else if (q1 === 'start_small') {
+                if (q3 === 'upgrade_later') {
+                     resultKey = 'PLATINUM'; // Start small but want all content access
+                } else if (q3 === 'advanced') {
+                    resultKey = 'PREMIUM'; // Start Small + Advanced Skills
+                } else {
+                    resultKey = 'PLUS'; // Start Small + Lowest Budget
+                }
+            }
+            
+            const result = PACKAGES[resultKey];
+            
+            document.getElementById('result-package-name').textContent = result.name;
+            document.getElementById('result-package-price').textContent = `$${result.price}`;
+            document.getElementById('result-package-focus').textContent = result.focus;
+            
+            // Set the function to be called on click, passing the package key
+            const packageKey = resultKey.toLowerCase();
+            document.getElementById('result-cta-link').onclick = () => scrollToPackage(packageKey);
+
+
+            showStep('result');
+        }
+
+        function restartQuiz() {
+            currentStep = 1;
+            quizAnswers = {};
+            showStep(1);
+        }
+
+
+        // --- EARNING POTENTIAL CALCULATOR LOGIC ---
+
+        const COMMISSION_RATE = 0.85; // Fixed at 85% for calculation
+        const PKR_RATE = 280; // Fixed at 280 PKR per USD
+
+        function getPackagePrice(key) {
+            const packageData = Object.values(PACKAGES).find(pkg => pkg.key === key);
+            return packageData ? packageData.price : 0;
+        }
+        
+        function formatUSD(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(amount);
+        }
+        
+        function formatPKR(amount) {
+            // Use 'en-PK' locale for Pakistani Rupee formatting
+            return new Intl.NumberFormat('en-PK', {
+                style: 'currency',
+                currency: 'PKR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(amount);
+        }
+
+        function calculateEarnings() {
+            const salesInput = document.getElementById('monthlySales');
+            const packageSelect = document.getElementById('packageSelect');
+            
+            // Ensure elements exist before proceeding
+            if (!salesInput || !packageSelect) return;
+
+            const monthlySales = parseInt(salesInput.value) || 0;
+            const packageKey = packageSelect.value;
+            const packagePriceUSD = getPackagePrice(packageKey);
+            
+            // Calculation in USD
+            const grossRevenueUSD = monthlySales * packagePriceUSD;
+            const monthlyEarningUSD = grossRevenueUSD * COMMISSION_RATE;
+            const annualEarningUSD = monthlyEarningUSD * 12;
+
+            // Calculation in PKR
+            const monthlyEarningPKR = monthlyEarningUSD * PKR_RATE;
+            const annualEarningPKR = annualEarningUSD * PKR_RATE;
+
+
+            // Update Display (USD)
+            document.getElementById('estimatedMonthlyUSD').textContent = formatUSD(monthlyEarningUSD);
+            document.getElementById('estimatedAnnualUSD').textContent = formatUSD(annualEarningUSD);
+
+            // Update Display (PKR)
+            document.getElementById('estimatedMonthlyPKR').textContent = formatPKR(monthlyEarningPKR);
+            document.getElementById('estimatedAnnualPKR').textContent = formatPKR(annualEarningPKR);
+            
+            // Update rate text
+            document.getElementById('rateText').textContent = `*Based on ${packageSelect.options[packageSelect.selectedIndex].text} price, an 85% commission rate, and 1 USD ≈ 280 PKR.`;
+        }
+
+        // --- DYNAMIC TESTIMONIAL DATES LOGIC ---
+
+        function generateDynamicDates() {
+            const dates = document.querySelectorAll('.testimonial-date');
+            
+            // Testimonial Specific Data
+            const testimonialData = {
+                't1': { earned: 450, daysAgo: Math.floor(Math.random() * 3) + 1 }, // 1 to 3 days ago
+                't2': { earned: 980, daysAgo: Math.floor(Math.random() * 5) + 3 }, // 3 to 7 days ago
+                't3': { earned: 1500, daysAgo: Math.floor(Math.random() * 10) + 7 }, // 7 to 16 days ago
+            };
+            
+            dates.forEach(span => {
+                const id = span.dataset.id;
+                const data = testimonialData[id] || { daysAgo: Math.floor(Math.random() * 7) + 1 }; // Fallback
+                
+                let unit = 'days';
+                let count = data.daysAgo;
+
+                // Make results for t1 look fresher (hours)
+                if (id === 't1' && count === 1) {
+                    count = Math.floor(Math.random() * 12) + 1; // 1 to 12 hours ago
+                    unit = 'hours';
+                }
+                
+                span.textContent = `${count} ${unit} ago`;
+                
+                // Set the specific earnings number
+                const earningsSpan = span.closest('.testimonial-info').querySelector('.testimonial-earnings');
+                if (earningsSpan) {
+                    // Displaying earnings in USD for testimonials as the original text implied USD
+                    earningsSpan.textContent = formatUSD(data.earned);
+                }
+            });
+        }
+
+    </script>
+
+</head>
+<body class="antialiased">
+    
+    <!-- FULL-PAGE ANIMATED CANVAS (The "Classical" Digital Network) -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Custom Message Modal (for contact form success) -->
+    <div id="messageModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-2xl font-bold text-primary-dark mb-3"></h3>
+            <p id="modalMessage" class="text-gray-600 mb-6"></p>
+            <button onclick="hideModal()" class="px-6 py-2 bg-primary-brand text-white font-semibold rounded-lg hover:bg-green-600 transition">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- --- QUIZ MODAL (Full-Screen Overlay) --- -->
+    <div id="quizModal" class="modal-overlay">
+        <div class="modal-content !w-full max-w-lg md:max-w-xl p-8 shadow-2xl">
+            <h3 class="text-3xl font-extrabold text-primary-dark mb-2">
+                Find Your Perfect Package
+            </h3>
+            <p id="quiz-progress-text" class="text-sm text-gray-500 mb-4 font-medium">Question 1 of 3</p>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+                <div id="quiz-progress" class="bg-primary-brand h-2.5 rounded-full transition-all duration-300 ease-in-out" style="width: 0%"></div>
+            </div>
+
+            <!-- Quiz Steps -->
+
+            <!-- Step 1: Primary Goal -->
+            <div id="step-1" class="quiz-step active">
+                <p class="text-xl font-semibold text-primary-dark mb-6">
+                    What is your **#1 goal** for joining Bizz Mentor?
+                </p>
+                <div class="space-y-4">
+                    <button data-value="max_earn" onclick="selectAnswer(1, 'max_earn', 2)" class="quiz-option-btn w-full p-4 border-2 border-gray-200 rounded-lg text-left shadow-sm">
+                        <span class="font-bold text-primary-brand">A. Maximize Earning:</span> Get the highest commission (80-90%) and full resale rights.
+                    </button>
+                    <button data-value="learn_only" onclick="selectAnswer(1, 'learn_only', 3)" class="quiz-option-btn w-full p-4 border-2 border-gray-200 rounded-lg text-left shadow-sm">
+                        <span class="font-bold text-primary-brand">B. Learn the Skills:</span> Focus only on the courses to start a career.
+                    </button>
+                    <button data-value="start_small" onclick="selectAnswer(1, 'start_small', 3)" class="quiz-option-btn w-full p-4 border-2 border-gray-200 rounded-lg text-left shadow-sm">
+                        <span class="font-bold text-primary-brand">C. Start Small:</span> Get basic access now with the option to upgrade later.
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Resale Scope (Only if Q1 = Maximize Earning) -->
+            <div id="step-2" class="quiz-step">
+                <p class="text-xl font-semibold text-primary-dark mb-6">
+                    You want to earn maximum commission. Do you need the right to resell **ALL FIVE** packages?
+                </p>
+                <div class="space-y-4">
+                    <button data-value="all" onclick="selectAnswer(2, 'all', 'result')" class="quiz-option-btn w-full p-4 border-2 border-gray-200 rounded-lg text-left shadow-sm">
+                        <span class="font-bold text-primary-brand">A. Yes:</span> I want the complete **PLATINUM** franchise to maximize every sale.
+                    </button>
+                    <button data-value="not_all" onclick="selectAnswer(2, 'not_all', 'result')" class="quiz-option-btn w-full p-4 border-2 border-gray-200 rounded-lg text-left shadow-sm">
+                        <span class="font-bold text-primary-brand">B. No:</span> Reselling up to the PREMIUM level is enough for me right now.
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Budget vs Skill (For Learn Only/Start Small) -->
+            <div id="step-3" class="quiz-step">
+                <p class="text-xl font-semibold text-primary-dark mb-6">
+                    Which factor is most critical to your decision right now?
+                </p>
+                <div class="space-y-4">
+                    <button data-value="budget" onclick="selectAnswer(3, 'budget', 'result')" class="quiz-option-btn w-full p-4 border-2 border-gray-200 rounded-lg text-left shadow-sm">
+                        <span class="font-bold text-primary-brand">A. Budget:</span> Getting the lowest possible entry price.
+                    </button>
+                    <button data-value="advanced" onclick="selectAnswer(3, 'advanced', 'result')" class="quiz-option-btn w-full p-4 border-2 border-gray-200 rounded-lg text-left shadow-sm">
+                        <span class="font-bold text-primary-brand">B. Advanced Skills:</span> Accessing deep courses like Amazon FBA, Google Ads, and Stock Market Basics.
+                    </button>
+                    <button data-value="upgrade_later" onclick="selectAnswer(3, 'upgrade_later', 'result')" class="quiz-option-btn w-full p-4 border-2 border-gray-200 rounded-lg text-left shadow-sm">
+                        <span class="font-bold text-primary-brand">C. Full Library:</span> I want all the learning content, including AI Marketing (PLATINUM courses).
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Step -->
+            <div id="step-result" class="quiz-step text-center">
+                <h4 class="text-xl font-bold text-primary-brand mb-4">🎉 Your Perfect Match! 🎉</h4>
+                <div class="p-6 bg-green-50 rounded-xl border-4 border-primary-brand shadow-lg">
+                    <p class="text-2xl font-extrabold text-primary-dark mb-2">The Recommended Package is:</p>
+                    <p class="text-5xl font-black text-indigo-600 mb-3" id="result-package-name"></p>
+                    <p class="text-xl font-semibold text-gray-700">Price: <span id="result-package-price" class="text-primary-brand font-bold"></span></p>
+                    <p class="text-sm text-gray-500 mt-2">Focus: <span id="result-package-focus"></span></p>
+                </div>
+
+                <div class="mt-8 space-y-3">
+                    <!-- IMPORTANT: The action is controlled by the JS onclick function set in showResult() -->
+                    <a id="result-cta-link" href="javascript:void(0);" class="block w-full py-3 bg-primary-brand text-white font-black text-lg rounded-lg shadow-xl hover:bg-green-600 transition">
+                        View Package Details & Enroll Now
+                    </a>
+                    <button onclick="restartQuiz()" class="w-full py-2 text-primary-dark font-semibold rounded-lg hover:bg-gray-100 transition">
+                        Restart Quiz
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Close Button for Quiz -->
+            <button onclick="hideModal('quizModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- --- LIVE NOTIFICATION POP-UP (Social Proof/FOMO) --- -->
+    <div id="live-notification" class="flex items-center space-x-3">
+        <!-- Globe Icon (or similar) -->
+        <svg class="w-6 h-6 text-primary-brand flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 14h-2v-4H8v-2h3V6h2v4h3v2h-3v4z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+            <p class="text-sm font-semibold leading-tight">
+                <span id="notif-name">User</span> from <span id="notif-location">City</span>
+            </p>
+            <p class="text-xs leading-tight mt-0.5">
+                Just purchased the <span id="notif-package" class="font-bold">PACKAGE</span>!
+            </p>
+            <p class="text-xs text-gray-400 mt-0.5">
+                1 minute ago
+            </p>
+        </div>
+    </div>
+    
+    <!-- Top News Ticker/Offer Bar -->
+    <div class="ticker-tape">
+        <div class="ticker-content text-base font-extrabold text-white uppercase tracking-wider">
+            🚨 &nbsp;&nbsp; 🚀 &nbsp;&nbsp; HUGE: KEEP 80-90% OF THE ENROLLMENT FEE ON EVERY SALE! &nbsp; &nbsp; START EARNING NOW! &nbsp;&nbsp; 🚀 &nbsp;&nbsp; >>> &nbsp;&nbsp; 🚨 &nbsp;&nbsp; HUGE: KEEP 80-90% OF THE ENROLLMENT FEE ON EVERY SALE! &nbsp; &nbsp; START EARNING NOW! &nbsp;&nbsp; 🚀 &nbsp;&nbsp; >>> &nbsp;&nbsp;
+        </div>
+    </div>
+
+    <!-- Sticky Header with Logo and NEW Navigation -->
+    <header class="sticky top-0 z-50 bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                
+                <!-- BIZZ MENTOR LOGO with Stronger Growth Pulse -->
+                <a href="#" class="text-3xl font-extrabold tracking-tight text-primary-dark flex items-center flex-shrink-0">
+                    <!-- Growth Chart Icon - Added 'logo-animate-pulse' class -->
+                    <svg class="h-8 w-8 text-primary-brand logo-animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8L11 17L3 9" />
+                    </svg>
+                    <span class="ml-2">BIZZ MENTOR</span>
+                </a>
+
+                <!-- NEW Navigation Links (Visible on MD screens and up) -->
+                <nav class="hidden md:flex space-x-6 lg:space-x-8 text-lg font-semibold flex-grow justify-center">
+                    <a href="#packages-start" class="text-gray-600 hover:text-primary-brand transition duration-150">Packages</a>
+                    <a href="#calculator" class="text-gray-600 hover:text-primary-brand transition duration-150">Earnings</a>
+                    <a href="#testimonials" class="text-gray-600 hover:text-primary-brand transition duration-150">Reviews</a>
+                    <a href="#contact" class="text-gray-600 hover:text-primary-brand transition duration-150">Contact</a>
+                </nav>
+
+                <!-- Affiliate Name -->
+                <p class="text-sm text-gray-500 hidden sm:block flex-shrink-0">
+                    <span class="font-bold text-primary-dark">Affiliate:</span> @Bizz_mentor_usmxn
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+
+        <section class="text-center mb-10">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-primary-dark tracking-tight mb-4">
+                Choose Your Path to Digital Mastery
+            </h1>
+            <p class="text-lg text-gray-600 max-w-4xl mx-auto">
+                Explore our five powerful packages. <span class="font-bold text-primary-brand">Click any card to see the full list of included courses!</span>
+            </p>
+            <div class="mt-4 text-sm text-gray-500">
+                (Note: Local currency conversions are approximate: $1 USD $\approx$ 280 PKR / $\approx$ ₹ 83 INR)
+            </div>
+        </section>
+
+        <!-- Key Benefits Section -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-primary-dark mb-8">Why Choose GrowBiz?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Benefit 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-primary-brand">
+                    <h3 class="font-semibold text-xl text-primary-dark mb-2">Practical Skills</h3>
+                    <p class="text-gray-600 text-sm">Every course is focused on real-world application, ensuring you can immediately use what you learn to generate income.</p>
+                </div>
+                <!-- Benefit 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-primary-brand">
+                    <h3 class="font-semibold text-xl text-primary-dark mb-2">Massive Value</h3>
+                    <p class="text-gray-600 text-sm">Access to dozens of high-quality courses for a fraction of the price you'd pay individually.</p>
+                </div>
+                <!-- Benefit 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-primary-brand">
+                    <h3 class="font-semibold text-xl text-primary-dark mb-2">Lifetime Access</h3>
+                    <p class="text-gray-600 text-sm">Pay once and get access forever, including all future updates within your purchased package.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- AFFILIATE OPPORTUNITY SECTION (Wording Updated) --- -->
+        <section id="affiliate-opportunity" class="mb-8 py-8 px-6 bg-primary-dark rounded-xl shadow-2xl text-white text-center border-b-8 border-primary-brand">
+            <h2 class="text-4xl font-extrabold tracking-tight mb-4 text-yellow-400">
+                🤯 KEEP 80-90% COMMISSION ON EVERY SALE!
+            </h2>
+            <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+                Every package is a complete **Digital Franchise**. You get the course content for life, PLUS immediate, exclusive rights to **resell any package**—earning a colossal commission directly!
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                <!-- Earning Benefit 1 -->
+                <div class="p-4 bg-gray-800 rounded-lg">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span class="text-2xl">💵</span>
+                        <h3 class="font-bold text-white text-lg">Unprecedented Payouts (80-90%)</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm">We offer **80-90% commission** on every package sold. This means you keep the vast majority of the sale price, making your investment profitable faster.</p>
+                </div>
+                <!-- Earning Benefit 2 -->
+                <div class="p-4 bg-gray-800 rounded-lg">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span class="text-2xl">🔗</span>
+                        <h3 class="font-bold text-white text-lg">Immediate Resale Rights</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm">No applications, no waiting. Your affiliate link is active the moment you enroll in **any** package, allowing you to launch your business instantly.</p>
+                </div>
+                <!-- Earning Benefit 3 - PLATINUM benefit is now stronger on CONTENT and MAX PROFIT-->
+                <div class="p-4 bg-gray-800 rounded-lg">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span class="text-2xl">👑</span>
+                        <h3 class="font-bold text-white text-lg">PLATINUM: Unlock Max Profit & Content</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm">Only the **PLATINUM** package gives you the **full learning library** (all 29 courses) *and* ensures you earn the highest potential commission rate on **all** package sales, maximizing your profit base.</p>
+                </div>
+            </div>
+        </section>
+        <!-- --- END AFFILIATE OPPORTUNITY SECTION --- -->
+        
+        <!-- NEW ANCHOR POINT FOR PACKAGES -->
+        <span id="packages-start" class="block -mt-16 pt-16"></span>
+
+        <!-- Pricing Accordion Grid (Responsive Layout) -->
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Package 1: PLUS (Icon: Checkmark) -->
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+                <button id="btn-plus" onclick="toggleCourses('plus')" class="package-card-btn w-full p-6 sm:p-8 flex justify-between items-center text-left transition duration-150 rounded-xl bg-gray-50 hover:bg-white active:bg-gray-100">
+                    <!-- Title and Icon -->
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <!-- Icon: Check Badge (Default) -->
+                            <svg class="w-8 h-8 text-primary-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h2 class="text-3xl font-extrabold text-primary-dark">PLUS PACKAGE</h2>
+                        </div>
+                        <!-- Wording Change: Explicitly says "Sell any package" but highlights foundational content -->
+                        <p class="text-gray-500 mt-1">Foundational Skills + **Resale Access** (Sell any package, keep 80-90% commission)</p>
+                    </div>
+                    <!-- Price and Arrow - NOTE: 'arrow-animate' added for the bounce effect -->
+                    <div class="text-right flex items-center space-x-6">
+                        <div class="flex flex-col">
+                            <span class="text-3xl font-bold text-primary-brand">$9</span>
+                            <span class="text-sm text-gray-700">PKR 2,520 | ₹ 747</span>
+                        </div>
+                        <svg id="icon-plus" class="arrow-icon w-8 h-8 text-primary-brand transform transition duration-300 arrow-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+
+                <!-- Course Content -->
+                <div id="content-plus" class="accordion-content bg-white px-6 sm:px-8">
+                    <h3 class="text-xl font-bold text-primary-dark mb-4">Included Courses (7)</h3>
+                    <ul class="space-y-2">
+                        <li class="course-list-item">Blogging (basics)</li>
+                        <li class="course-list-item">Facebook Ads</li>
+                        <li class="course-list-item">YouTube for Business (Basic)</li>
+                        <li class="course-list-item">Video Editing</li>
+                        <li class="course-list-item">Canva Graphics Designing</li>
+                        <li class="course-list-item">Personality Development</li>
+                        <li class="course-list-item">Public Speaking</li>
+                    </ul>
+                    <!-- Enrollment Button -->
+                    <div class="mt-8 pt-4 border-t border-gray-200">
+                        <!-- IMPORTANT: Replace #checkout-plus with your actual affiliate link for the PLUS package -->
+                        <a href="https://growbiznetwork.com/course-bundle/1" target="_blank" class="block w-full text-center py-3 bg-primary-brand text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-600 transition duration-200">
+                            Enroll & Start Earning with PLUS Package
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package 2: PRO (Icon: Trophy) -->
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+                <button id="btn-pro" onclick="toggleCourses('pro')" class="package-card-btn w-full p-6 sm:p-8 flex justify-between items-center text-left transition duration-150 rounded-xl bg-gray-50 hover:bg-white active:bg-gray-100">
+                    <!-- Title and Icon -->
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <!-- Icon: Trophy (Primary Brand Color) -->
+                            <svg class="w-8 h-8 text-primary-brand" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 9.5a6 6 0 00-12 0v1h12v-1zM12 2a4 4 0 014 4v.5h-8V6a4 4 0 014-4zm-4 17h8v-1H8v1zM6 18V9.5h12V18H6z"/></svg>
+                            <h2 class="text-3xl font-extrabold text-primary-dark">PRO PACKAGE</h2>
+                        </div>
+                         <!-- Wording Change: Explicitly says "Sell any package" but highlights learning more content -->
+                        <p class="text-gray-500 mt-1">All PLUS courses + **Resale Access** (Sell any package, keep 80-90% commission)</p>
+                    </div>
+                    <!-- Price and Arrow - NOTE: 'arrow-animate' added for the bounce effect -->
+                    <div class="text-right flex items-center space-x-6">
+                        <div class="flex flex-col">
+                            <span class="text-3xl font-bold text-primary-brand">$23</span>
+                            <span class="text-sm text-gray-700">PKR 6,440 | ₹ 1,909</span>
+                        </div>
+                        <svg id="icon-pro" class="arrow-icon w-8 h-8 text-primary-brand transform transition duration-300 arrow-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+
+                <!-- Course Content -->
+                <div id="content-pro" class="accordion-content bg-white px-6 sm:px-8">
+                    <h3 class="text-xl font-bold text-primary-dark mb-4">New Courses Added (8)</h3>
+                    <p class="text-sm font-semibold text-primary-brand mb-4">Includes all 7 courses from the PLUS Package.</p>
+                    <ul class="space-y-2">
+                        <li class="course-list-item">LinkedIn Marketing</li>
+                        <li class="course-list-item">Excel (Basic)</li>
+                        <li class="course-list-item">Reels Marketing</li>
+                        <li class="course-list-item">Sales Mastery</li>
+                        <li class="course-list-item">English Speaking</li>
+                        <li class="course-list-item">Digital Marketing</li>
+                        <li class="course-list-item">Video Marketing</li>
+                        <li class="course-list-item">Personal Branding</li>
+                    </ul>
+                    <!-- Enrollment Button -->
+                    <div class="mt-8 pt-4 border-t border-gray-200">
+                        <!-- IMPORTANT: Replace #checkout-pro with your actual affiliate link for the PRO package -->
+                        <a href="https://growbiznetwork.com/course-bundle/2" target="_blank" class="block w-full text-center py-3 bg-primary-brand text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-600 transition duration-200">
+                            Enroll & Start Earning with PRO Package
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package 3: PRIME (Exclusive Icon: Diamond) -->
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+                <button id="btn-prime" onclick="toggleCourses('prime')" class="package-card-btn w-full p-6 sm:p-8 flex justify-between items-center text-left transition duration-150 rounded-xl bg-gray-50 hover:bg-white active:bg-gray-100">
+                    <!-- Title and Icon -->
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <!-- Icon: Diamond (Cyan) -->
+                            <svg class="w-8 h-8 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1L4 6l8 17 8-17z"></path></svg>
+                            <h2 class="text-3xl font-extrabold text-primary-dark">PRIME PACKAGE</h2>
+                        </div>
+                        <!-- Wording Change: Explicitly says "Sell any package" but highlights learning more content -->
+                        <p class="text-gray-500 mt-1">All PRO courses + **Resale Access** (Sell any package, keep 80-90% commission)</p>
+                    </div>
+                    <!-- Price and Arrow - NOTE: 'arrow-animate' added for the bounce effect -->
+                    <div class="text-right flex items-center space-x-6">
+                        <div class="flex flex-col">
+                            <span class="text-3xl font-bold text-primary-brand">$53</span>
+                            <span class="text-sm text-gray-700">PKR 14,840 | ₹ 4,399</span>
+                        </div>
+                        <svg id="icon-prime" class="arrow-icon w-8 h-8 text-primary-brand transform transition duration-300 arrow-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+
+                <!-- Course Content -->
+                <div id="content-prime" class="accordion-content bg-white px-6 sm:px-8">
+                    <h3 class="text-xl font-bold text-primary-dark mb-4">New Courses Added (7)</h3>
+                    <p class="text-sm font-semibold text-primary-brand mb-4">Includes all 15 courses from the PLUS and PRO Packages.</p>
+                    <ul class="space-y-2">
+                        <li class="course-list-item">Instagram Growth and Marketing</li>
+                        <li class="course-list-item">Advance Excel</li>
+                        <li class="course-list-item">Tally (Accounting Software)</li>
+                        <li class="course-list-item">Drop Shipping</li>
+                        <li class="course-list-item">MS Word Proficiency</li>
+                        <li class="course-list-item">Freelancing Workplaces Setup</li>
+                        <li class="course-list-item">Content Creation Strategies</li>
+                    </ul>
+                    <!-- Enrollment Button -->
+                    <div class="mt-8 pt-4 border-t border-gray-200">
+                        <!-- IMPORTANT: Replace #checkout-prime with your actual affiliate link for the PRIME package -->
+                        <a href="https://growbiznetwork.com/course-bundle/3" target="_blank" class="block w-full text-center py-3 bg-primary-brand text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-600 transition duration-200">
+                            Enroll & Start Earning with PRIME Package
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package 4: PREMIUM (Exclusive Icon: Star/Sparkle) -->
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+                <button id="btn-premium" onclick="toggleCourses('premium')" class="package-card-btn w-full p-6 sm:p-8 flex justify-between items-center text-left transition duration-150 rounded-xl bg-gray-50 hover:bg-white active:bg-gray-100">
+                    <!-- Title and Icon -->
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <!-- Icon: Star/Sparkle (Amber) -->
+                            <svg class="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l1.6 4.8h5.1l-4.1 3.2 1.6 4.8-4.1-3.2-4.1 3.2 1.6-4.8-4.1-3.2h5.1z"/></svg>
+                            <h2 class="text-3xl font-extrabold text-primary-dark">PREMIUM PACKAGE</h2>
+                        </div>
+                        <!-- Wording Change: Explicitly says "Sell any package" but highlights learning more content -->
+                        <p class="text-gray-500 mt-1">All PRIME courses + **Resale Access** (Sell any package, keep 80-90% commission)</p>
+                    </div>
+                    <!-- Price and Arrow - NOTE: 'arrow-animate' added for the bounce effect -->
+                    <div class="text-right flex items-center space-x-6">
+                        <div class="flex flex-col">
+                            <span class="text-3xl font-bold text-primary-brand">$122</span>
+                            <span class="text-sm text-gray-700">PKR 34,160 | ₹ 10,126</span>
+                        </div>
+                        <svg id="icon-premium" class="arrow-icon w-8 h-8 text-primary-brand transform transition duration-300 arrow-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </button>
+
+                <!-- Course Content -->
+                <div id="content-premium" class="accordion-content bg-white px-6 sm:px-8">
+                    <h3 class="text-xl font-bold text-primary-dark mb-4">New Courses Added (4)</h3>
+                    <p class="text-sm font-semibold text-primary-brand mb-4">Includes all 22 courses from the PLUS, PRO, and PRIME Packages.</p>
+                    <ul class="space-y-2">
+                        <li class="course-list-item">Amazon Affiliate Marketing FBA</li>
+                        <li class="course-list-item">Google Ads Masterclass</li>
+                        <li class="course-list-item">Stock Market Basics</li>
+                        <li class="course-list-item">Social Media Marketing (Advanced Strategy)</li>
+                    </ul>
+                    <!-- Enrollment Button -->
+                    <div class="mt-8 pt-4 border-t border-gray-200">
+                        <!-- IMPORTANT: Replace #checkout-premium with your actual affiliate link for the PREMIUM package -->
+                        <a href="https://growbiznetwork.com/course-bundle/4" target="_blank" class="block w-full text-center py-3 bg-primary-brand text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-600 transition duration-200">
+                            Enroll & Start Earning with PREMIUM Package
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package 5: PLATINUM (Exclusive Icon: Crown) - HIGHLIGHTED -->
+<div id="platinum-package" class="bg-green-50 rounded-xl shadow-2xl overflow-hidden border-4 border-primary-brand relative platinum">
+    <!-- BEST VALUE RIBBON -->
+    <div class="best-value-ribbon">
+        👑 MAX PROFIT 👑
+    </div>
+    
+    <button id="btn-platinum" onclick="toggleCourses('platinum')" class="package-card-btn w-full p-6 sm:p-8 flex justify-between items-center text-left transition duration-150 rounded-xl bg-green-100 hover:bg-white active:bg-primary-dark dropdown-btn">
+        <!-- Title and Icon -->
+        <div>
+            <div class="flex items-center space-x-3">
+                <!-- Icon: Crown (Indigo) -->
+                <svg class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 10h-2l-3 4-3-4-3 4-3-4H3l2-6h14l2 6zM5 16l-1 5h16l-1-5H5z"/></svg>
+                <h2 class="text-3xl font-extrabold text-primary-dark">PLATINUM PACKAGE</h2>
+            </div>
+            <!-- Wording Change: Focuses on ALL CONTENT and MAX EARNING potential -->
+            <p class="text-gray-600 mt-1 font-semibold">The Complete Bundle (All 29 Courses) + **MAX Earning Potential**</p>
+        </div>
+        <!-- Price and Arrow - NOTE: 'arrow-animate' added for the bounce effect -->
+        <div class="text-right flex items-center space-x-6">
+            <div class="flex flex-col">
+                <span class="text-3xl font-bold text-primary-brand">$200</span>
+                <span class="text-sm text-gray-700">PKR 56,000 | ₹ 16,600</span>
+            </div>
+            <svg id="icon-platinum" class="arrow-icon w-8 h-8 text-primary-brand transform transition duration-300 arrow-animate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+    </button>
+</div>
+
+
+                <!-- Course Content -->
+                <div id="content-platinum" class="accordion-content bg-white px-6 sm:px-8">
+                    <h3 class="text-xl font-bold text-primary-dark mb-4">New Courses Added (3)</h3>
+                    <p class="text-sm font-semibold text-primary-brand mb-4">Includes all 26 courses from the PLUS, PRO, PRIME, and PREMIUM Packages.</p>
+                    <ul class="space-y-2">
+                        <li class="course-list-item">AI Based Digital Marketing</li>
+                        <li class="course-list-item">Content Writing (In-Depth)</li>
+                        <li class="course-list-item">Instagram Master Mind Strategies</li>
+                    </ul>
+                    <!-- Enrollment Button -->
+                    <div class="mt-8 pt-4 border-t border-gray-200">
+                        <!-- IMPORTANT: Replace #checkout-platinum with your actual affiliate link for the PLATINUM package -->
+                        <a href="https://growbiznetwork.com/course-bundle/9" target="_blank" class="block w-full text-center py-3 bg-primary-brand text-white font-black text-lg rounded-lg shadow-lg hover:bg-green-600 transition duration-200 transform scale-100 hover:scale-[1.01] active:scale-95">
+                            Unlock PLATINUM: Learn & Earn Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- --- END Pricing Accordion Grid --- -->
+
+        <!-- --- QUIZ CTA BUTTON (New Section) --- -->
+        <section class="text-center mt-12 mb-16">
+            <button onclick="startQuiz()" class="inline-flex items-center justify-center px-8 py-3 bg-red-500 text-white font-black text-xl rounded-full shadow-2xl transform transition duration-300 hover:scale-105 hover:bg-red-600 active:scale-95">
+                <!-- Sparkle Icon -->
+                <svg class="w-6 h-6 mr-3 animate-pulse" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l1.6 4.8h5.1l-4.1 3.2 1.6 4.8-4.1-3.2-4.1 3.2 1.6-4.8-4.1-3.2h5.1z"/></svg>
+                Still Confused? Take the 60-Second Quiz!
+            </button>
+<!-- World's Most Loved Educational Platform Section -->
+<section class="text-center py-16 bg-white">
+  <h2 class="text-4xl font-extrabold mb-10" data-aos="zoom-in">
+    World's Most Loved <span class="text-yellow-500">Educational</span> Platform
+  </h2>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-10">
+    <div data-aos="zoom-in-up">
+      <h3 class="text-3xl font-bold text-blue-600">25000+</h3>
+      <p class="text-gray-600">Students Enrolled</p>
+    </div>
+
+    <div data-aos="zoom-in-up">
+      <h3 class="text-3xl font-bold text-pink-600">4+</h3>
+      <p class="text-gray-600">Years of Educational</p>
+    </div>
+
+    <div data-aos="zoom-in-up">
+      <h3 class="text-3xl font-bold text-orange-600">25+</h3>
+      <p class="text-gray-600">Expert Faculties</p>
+    </div>
+
+    <div data-aos="zoom-in-up">
+      <h3 class="text-3xl font-bold text-purple-600">15+</h3>
+      <p class="text-gray-600">Number of Countries</p>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+        </section>
+        
+        <!-- --- EARNING POTENTIAL CALCULATOR --- -->
+        <!-- ANCHOR POINT FOR CALCULATOR -->
+        <section id="calculator" class="mb-16 py-10 px-6 bg-white rounded-xl shadow-2xl border-t-8 border-primary-brand">
+            <h2 class="text-3xl font-bold text-center text-primary-dark mb-8">
+                💰 Affiliate Earning Calculator
+            </h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+                See your estimated commission based on your monthly sales goal. *Calculated instantly at an **85% commission rate**.*
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                <!-- Input Controls -->
+                <div class="space-y-4">
+                    <!-- Input 1: Monthly Sales Goal -->
+                    <div>
+                        <label for="monthlySales" class="block text-sm font-semibold text-primary-dark mb-2">
+                            1. Target Monthly Sales (How many packages?)
+                        </label>
+                        <input type="number" id="monthlySales" value="10" min="0" step="1" oninput="calculateEarnings()" class="w-full px-4 py-3 border-2 border-primary-brand rounded-lg text-lg font-bold text-center focus:ring-green-500 focus:border-green-500 transition">
+                    </div>
+                    <!-- Input 2: Average Package Price -->
+                    <div>
+                        <label for="packageSelect" class="block text-sm font-semibold text-primary-dark mb-2">
+                            2. Choose Average Package Sold
+                        </label>
+                        <select id="packageSelect" onchange="calculateEarnings()" class="w-full px-4 py-3 border-2 border-primary-dark rounded-lg text-lg font-bold appearance-none bg-white focus:ring-green-500 focus:border-green-500 transition">
+                            <option value="platinum">PLATINUM ($200)</option>
+                            <option value="premium">PREMIUM ($122)</option>
+                            <option value="prime">PRIME ($53)</option>
+                            <option value="pro">PRO ($23)</option>
+                            <option value="plus">PLUS ($9)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Output Display - UPDATED TO SHOW USD/PKR -->
+                <div class="p-6 bg-primary-dark text-white rounded-xl shadow-inner flex flex-col justify-center">
+                    <h3 class="text-xl font-extrabold text-yellow-400 mb-4 text-center">Your Estimated Earning Potential</h3>
+                    
+                    <!-- Monthly Earning (USD & PKR) -->
+                    <div class="py-3 border-b border-gray-700">
+                        <span class="text-lg font-medium flex items-center mb-1">💵 Estimated Monthly Income:</span>
+                        <div class="flex justify-between items-baseline">
+                            <span id="estimatedMonthlyUSD" class="text-4xl font-black text-primary-brand">$1,700</span>
+                            <span id="estimatedMonthlyPKR" class="text-xl font-bold text-gray-300">PKR 476,000</span>
+                        </div>
+                    </div>
+
+                    <!-- Annual Earning (USD & PKR) -->
+                    <div class="pt-3">
+                        <span class="text-lg font-medium flex items-center mb-1">📈 Estimated Annual Income:</span>
+                         <div class="flex justify-between items-baseline">
+                            <span id="estimatedAnnualUSD" class="text-3xl font-black text-primary-brand">$20,400</span>
+                            <span id="estimatedAnnualPKR" class="text-xl font-bold text-gray-300">PKR 5,712,000</span>
+                        </div>
+                    </div>
+
+                    <p id="rateText" class="text-xs text-gray-400 mt-4 text-right">
+                        *Based on PLATINUM Package price, an 85% commission rate, and 1 USD $\approx$ 280 PKR.
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-center mt-8">
+                <a href="#affiliate-opportunity" class="text-primary-brand font-semibold hover:underline text-sm transition">
+                    Learn more about the 80-90% commission model
+                </a>
+            </div>
+        </section>
+        <!-- --- END EARNING POTENTIAL CALCULATOR --- -->
+
+
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="mt-20">
+            <h2 class="text-3xl font-bold text-center text-primary-dark mb-8">What Our Students Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <!-- Testimonial 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border-l-4 border-primary-brand">
+                    <p class="italic text-gray-700 mb-4">
+                        "I jumped into the **PRO package** and the Sales Mastery course alone paid for the entire investment. The content is directly actionable and the quality is superb!"
+                    </p>
+                    <div class="font-semibold text-primary-dark testimonial-info">- Ahsan K., Karachi 
+                        <span class="text-sm text-gray-500 ml-2">(<span class="testimonial-earnings text-primary-brand font-bold">$450</span> earned in <span class="testimonial-date" data-id="t1">X days ago</span>)</span>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border-l-4 border-primary-brand">
+                    <p class="italic text-gray-700 mb-4">
+                        "The **PLATINUM** package gave me everything I needed. Using the AI Marketing course, I hit my first thousand dollar week."
+                    </p>
+                    <div class="font-semibold text-primary-dark testimonial-info">- Saima R., Dubai
+                         <span class="text-sm text-gray-500 ml-2">(<span class="testimonial-earnings text-primary-brand font-bold">$980</span> earned in <span class="testimonial-date" data-id="t2">X days ago</span>)</span>
+                    </div>
+                </div>
+                
+                 <!-- Testimonial 3 (New) -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border-l-4 border-primary-brand">
+                    <p class="italic text-gray-700 mb-4">
+                        "The PRIME package gave me everything I needed to start freelancing. The Advance Excel and Freelancing Workplaces modules were game-changers for my career transition."
+                    </p>
+                    <div class="font-semibold text-primary-dark testimonial-info">- Priya S., New Delhi
+                        <span class="text-sm text-gray-500 ml-2">(<span class="testimonial-earnings text-primary-brand font-bold">$1,500</span> earned in <span class="testimonial-date" data-id="t3">X days ago</span>)</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Contact/Query Form Section -->
+        <section id="contact" class="mt-20 py-12 px-6 bg-white rounded-xl shadow-2xl border border-gray-200">
+            <h2 class="text-3xl font-bold text-center text-primary-dark mb-8">Have a Question Before Enrolling?</h2>
+            <p class="text-center text-gray-600 mb-4 max-w-2xl mx-auto">
+                If you need clarification on a course, a package, or payment, send us a quick query below. **For the fastest response, you can also DM me directly on Instagram: <a href="https://instagram.com/Bizz_mentor_usmxn" target="_blank" class="text-primary-brand font-bold hover:underline">@Bizz_mentor_usmxn</a>.**
+            </p>
+            <form id="queryForm" onsubmit="handleSubmitQuery(event)" class="max-w-xl mx-auto space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Your Full Name</label>
+                    <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-brand focus:border-primary-brand transition">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-brand focus:border-primary-brand transition">
+                </div>
+                <div>
+                    <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Your Query</label>
+                    <textarea id="query" name="query" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-brand focus:border-primary-brand transition"></textarea>
+                </div>
+                <div>
+                    <button type="submit" class="w-full mt-4 py-3 bg-primary-brand text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-600 transition duration-200">
+                        Send Query
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Final Call to Action Section -->
+        <section class="mt-20 py-12 bg-primary-dark rounded-xl shadow-2xl text-center">
+            <div class="max-w-3xl mx-auto px-4">
+                <h2 class="text-4xl font-extrabold text-white mb-4">
+                    Ready to Transform Your Future?
+                </h2>
+                <p class="text-xl text-gray-300 mb-8">
+                    Start learning, earning, and building your business today. The **PLATINUM** package gives you **all 29 courses** and the **full 80-90% earning potential.**
+                </p>
+                <!-- Final Enrollment Button -->
+                <!-- IMPORTANT: Replace #checkout-platinum with your actual affiliate link for the PLATINUM package -->
+                <!-- Footer CTA: replaced with controlled ID -->
+<a id="footer-platinum-cta" href="javascript:void(0);"
+   class="inline-block px-10 py-4 bg-primary-brand text-white font-black text-xl uppercase rounded-full shadow-lg transform transition duration-300 hover:scale-105 hover:bg-green-600 active:scale-95">
+   Unlock PLATINUM: Learn & Earn Now
+</a>
+
+
+
+            </div>
+        </section>
+    </main>
+<div class="text-center my-10">
+  <h2 class="text-2xl font-bold text-red-600 mb-4">
+    USE REFERRAL CODE: 2I751B
+  </h2>
+  <a href="#" onclick="copySponsorAndOpen('2I751B','https://growbiznetwork.com/')" 
+     class="px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700 transition">
+     JOIN NOW
+  </a>
+</div>
+
+
+
+    <!-- Footer -->
+    <footer class="bg-primary-dark mt-12 py-8 text-center text-gray-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- NEW: Static Affiliate Disclosure (smaller and theme-matched) -->
+            <div class="w-full text-center text-xs font-medium py-3 border-b border-gray-700 mb-4">
+                <span class="text-red-400 font-extrabold">⚠️ AFFILIATE DISCLOSURE:</span> This page contains affiliate links. If you enroll through these links, I earn a commission at **no extra cost** to you.
+            </div>
+
+            <!-- Standard Footer Content -->
+            <p class="mb-2">
+                Affiliated Partner for GrowBiz Network. | Need Help?
+            </p>
+            <p class="text-sm space-x-4">
+                <span class="font-bold">Email:</span> <a href="mailto:uthegamer666@gmail.com" class="hover:text-white transition">uthegamer666@gmail.com</a>
+                <span class="font-bold">Instagram:</span> <a href="https://instagram.com/Bizz_mentor_usmxn" target="_blank" class="hover:text-white transition">@Bizz_mentor_usmxn</a>
+            </p>
+            <p class="mt-4 text-xs text-gray-500">
+                Page created by BIZZ MENTOR.
+            </p>
+        </div>
+    </footer>
+	<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const elements = document.querySelectorAll("section, footer, header");
+  elements.forEach(el => {
+    el.style.opacity = 0;
+    el.style.transition = "opacity 1s ease-out";
+  });
+  let i = 0;
+  const fadeIn = () => {
+    if (i < elements.length) {
+      elements[i].style.opacity = 1;
+      i++;
+      setTimeout(fadeIn, 300);
+    }
+  };
+  fadeIn();
+});
+</script>
+
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const fadeEls = document.querySelectorAll(".fade-in");
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+            }
+          });
+        }, { threshold: 0.2 });
+
+        fadeEls.forEach(el => observer.observe(el));
+      });
+    </script>
+<script>
+function copySponsorAndOpen(code, url) {
+  // copy to clipboard
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(code).catch(()=>{});
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+  // open signup page
+  setTimeout(() => {
+    window.open(url, '_blank');
+  }, 120);
+}
+</script>
+</footer>
+<script>
+(function () {
+  // CONFIG: the id on the platinum wrapper you set earlier
+  const PLATINUM_ID = "platinum-package"; // update if your div has a different id
+  const PLATINUM_BTN_ID = "btn-platinum";
+
+  function findPlatinumTarget() {
+    // Try common options: exact id, fallback to element with id 'platinum', or the btn's closest container
+    let target = document.getElementById(PLATINUM_ID) || document.getElementById("platinum");
+    if (!target) {
+      const btn = document.getElementById(PLATINUM_BTN_ID);
+      if (btn) target = btn.closest("div");
+    }
+    return target;
+  }
+
+  function scrollAndOpen() {
+    const target = findPlatinumTarget();
+    if (!target) {
+      console.error("scrollToPlatinum: platinum target not found. Check the id on the platinum div.");
+      return;
+    }
+
+    // Calculate header height so the card doesn't hide under sticky header
+    const header = document.querySelector("header");
+    const headerHeight = header ? header.offsetHeight + 12 : 0; // +12 for spacing
+
+    const rect = target.getBoundingClientRect();
+    const targetY = window.scrollY + rect.top - headerHeight;
+
+    window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
+
+    // After a small delay (wait for scroll), open the dropdown and highlight
+    setTimeout(() => {
+      const btn = document.getElementById(PLATINUM_BTN_ID);
+      if (btn) {
+        try { btn.click(); } catch (e) { /* ignore */ }
+      }
+
+      // Add highlight if your .highlight-flash class exists
+      target.classList.add("highlight-flash");
+      setTimeout(() => target.classList.remove("highlight-flash"), 1600);
+    }, 650); // tweak delay if needed
+  }
+
+  // Wire the footer CTA
+  const footerBtn = document.getElementById("footer-platinum-cta");
+  if (footerBtn) {
+    footerBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      scrollAndOpen();
+    });
+  } else {
+    console.error("Footer platinum CTA not found (id: footer-platinum-cta).");
+  }
+
+  // Optional: expose globally for manual testing
+  window.scrollToPlatinum = scrollAndOpen;
+})();
+</script>
+
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1200, // animation duration
+    once: true      // only animate once
+  });
+</script>
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/923122150948" target="_blank" class="whatsapp-float" aria-label="Chat on WhatsApp">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-icon">
+</a>
+
+
+</body>
+</html>
+
+</body>
+</html>
